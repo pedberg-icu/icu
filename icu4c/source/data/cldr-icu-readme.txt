@@ -30,6 +30,9 @@
 # plus the xml-apis.jar from the Apache xalan package
 # (http://xml.apache.org/xalan-j/downloads.html).
 #
+# You will also need to have performed the CLDR Maven setup (non-Eclipse version)
+# per http://cldr.unicode.org/development/maven 
+#
 # Note: Enough things can (and will) fail in this process that it is best to
 #   run the commands separately from an interactive shell. They should all
 #   copy and paste without problems.
