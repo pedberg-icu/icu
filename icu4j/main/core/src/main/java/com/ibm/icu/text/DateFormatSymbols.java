@@ -12,6 +12,7 @@ package com.ibm.icu.text;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.lang.Integer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1805,8 +1806,34 @@ public class DateFormatSymbols implements Serializable, Cloneable {
                     String[] dataArray = value.getStringArray();
                     arrays.put(currentPath, dataArray);
                 } else if (value.getType() == ICUResourceBundle.TABLE) {
-                    // We are not on a leaf, recursively process the subtable.
-                    processResource(currentPath, key, value);
+                    // We might have an eras table that is replacing an eras leaf array
+                    if (currentPath.startsWith("eras")) {
+                        // path is one of eras/wide, eras/abbreviated, eras/narrow
+                        UResource.Table rDataTable = value.getTable();
+                        int dataTableSize = rDataTable.getSize();
+                        TreeMap<Integer, String> eraCodeAndNames = new TreeMap<>();
+                        // Collect the era entries that we do have into map sorted by era code
+                        for (int dataTableIndex = 0; dataTableIndex < dataTableSize; dataTableIndex++) {
+                           rDataTable.getKeyAndValue(dataTableIndex, key, value);
+                           Integer eraCode = Integer.valueOf(key.toString());
+                           String eraName = (value.getType() == ICUResourceBundle.STRING)? value.getString(): "";
+                           eraCodeAndNames.put(eraCode, eraName);
+                        }
+                        // Now allocate an array running from era code 0 to the max era we have data for, then
+                        // fill in the entries we have data for with the real names and fill in empty string for
+                        // the others, and save the array.
+                        int maxEraCode = eraCodeAndNames.lastKey().intValue();
+                        int dataArraySize = maxEraCode + 1; // since it runs from 0 through maxEraCode
+                        String[] dataArray = new String[dataArraySize];
+                        for (int dataArrayIndex = 0; dataArrayIndex < dataArraySize; dataArrayIndex++) {
+                            String eraName = eraCodeAndNames.get(Integer.valueOf(dataArrayIndex));
+                            dataArray[dataArrayIndex] = (eraName != null)? eraName: "";
+                        }
+                        arrays.put(currentPath, dataArray);
+                    } else {
+                        // We are not on a leaf, recursively process the subtable.
+                        processResource(currentPath, key, value);
+                    }
                 }
             }
         }

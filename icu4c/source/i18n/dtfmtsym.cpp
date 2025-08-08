@@ -1490,6 +1490,27 @@ const char16_t kFormatTagUChar[] = {
 const char16_t kAbbrTagUChar[] = {
     SOLIDUS, LOW_A, LOW_B, LOW_B, LOW_R, LOW_E, LOW_V, LOW_I, LOW_A, LOW_T, LOW_E, LOW_D
 };
+const char16_t kErasTagUChar[] = {
+    LOW_E, LOW_R, LOW_A, LOW_S
+};
+
+struct EraCodeAndName : public UObject {
+    int32_t       eraCode;
+    UnicodeString eraName;
+};
+
+// Comparison function used in quick sort.
+static int U_CALLCONV erasCodeAndNameComparator(const void* a, const void* b) {
+    const EraCodeAndName* eraCodeAndName1 = static_cast<const EraCodeAndName*>(a);
+    const EraCodeAndName* eraCodeAndName2 = static_cast<const EraCodeAndName*>(b);
+    if (eraCodeAndName1->eraCode < eraCodeAndName2->eraCode) {
+        return -1;
+    }
+    if (eraCodeAndName1->eraCode > eraCodeAndName2->eraCode) {
+        return 1;
+    }
+    return eraCodeAndName1->eraName.compare(eraCodeAndName2->eraName);
+}
 
 // ResourceSink to enumerate all calendar resources
 struct CalendarDataSink : public ResourceSink {
@@ -1782,8 +1803,43 @@ struct CalendarDataSink : public ResourceSink {
                 arraySizes.puti(path, dataArraySize, errorCode);
                 if (U_FAILURE(errorCode)) { return; }
             } else if (value.getType() == URES_TABLE) {
-                // We are not on a leaf, recursively process the subtable.
-                processResource(path, key, value, errorCode);
+                // We might have an eras table that is replacing an eras leaf array
+                if (path.startsWith(kErasTagUChar, UPRV_LENGTHOF(kErasTagUChar))) {
+                    // path is one of eras/wide, eras/abbreviated, eras/narrow
+                    ResourceTable rDataTable = value.getTable(errorCode);
+                    int32_t dataTableSize = rDataTable.getSize();
+                    LocalArray<EraCodeAndName> eraCodeAndNames(new EraCodeAndName[dataTableSize], errorCode);
+                    // Collect the era entries that we do have, then sort by era code
+                    for (int32_t dataTableIndex = 0; dataTableIndex < dataTableSize; dataTableIndex++) {
+                        rDataTable.getKeyAndValue(dataTableIndex, key, value);
+                        eraCodeAndNames[dataTableIndex].eraCode = strtol(key, nullptr, 10);
+                        if (value.getType() == URES_STRING) {
+                            eraCodeAndNames[dataTableIndex].eraName.setTo(value.getUnicodeString(errorCode));
+                        } else {
+                            eraCodeAndNames[dataTableIndex].eraName.remove();
+                        }
+                    }
+                    qsort(eraCodeAndNames.getAlias(), dataTableSize, sizeof(EraCodeAndName), erasCodeAndNameComparator);
+                    // Now allocate an array running from era code 0 to the max era we have data for, then fill in the
+                    // entries we have data for with the real names and fill in empty string for the others, and save the array.
+                    int32_t maxEraCode = eraCodeAndNames[dataTableSize - 1].eraCode;
+                    int32_t dataArraySize = maxEraCode + 1; // since it runs from 0 through maxEraCode
+                    LocalArray<UnicodeString> dataArray(new UnicodeString[dataArraySize], errorCode);
+                    int32_t dataTableIndex = 0;
+                    for (int32_t dataArrayIndex = 0; dataArrayIndex < dataArraySize; dataArrayIndex++) {
+                        if (dataArrayIndex == eraCodeAndNames[dataTableIndex].eraCode) {
+                            dataArray[dataArrayIndex].setTo(eraCodeAndNames[dataTableIndex].eraName);
+                            dataTableIndex++;
+                        } else {
+                            dataArray[dataArrayIndex].remove();
+                        }
+                    }
+                    arrays.put(path, dataArray.orphan(), errorCode);
+                    arraySizes.puti(path, dataArraySize, errorCode);
+                } else {
+                    // We are not on a leaf, recursively process the subtable.
+                    processResource(path, key, value, errorCode);
+                }
                 if (U_FAILURE(errorCode)) { return; }
             }
 
