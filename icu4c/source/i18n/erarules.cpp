@@ -17,6 +17,7 @@
 #include "erarules.h"
 #include "gregoimp.h"
 #include "uassert.h"
+#include "uvector.h"
 
 U_NAMESPACE_BEGIN
 
@@ -102,9 +103,9 @@ static int32_t compareEncodedDateWithYMD(int encoded, int year, int month, int d
     }
 }
 
-EraRules::EraRules(LocalMemory<int32_t>& eraStartDates, int32_t numEras)
-    : numEras(numEras) {
-    startDates = std::move(eraStartDates);
+EraRules::EraRules(LocalMemory<StartDateAndEra>&  startDateAndErasIn, int32_t numErasIn)
+    : numEras(numErasIn) {
+    startDateAndEras = std::move(startDateAndErasIn);
     initCurrentEra();
 }
 
@@ -127,12 +128,10 @@ EraRules* EraRules::createInstance(const char *calType, UBool includeTentativeEr
     int32_t numEras = ures_getSize(rb.getAlias());
     int32_t firstTentativeIdx = MAX_INT32;
 
-    LocalMemory<int32_t> startDates(static_cast<int32_t *>(uprv_malloc(numEras * sizeof(int32_t))));
-    if (startDates.isNull()) {
-        status = U_MEMORY_ALLOCATION_ERROR;
+    UVector eraStartDates(numEras, status);
+    if (U_FAILURE(status)) {
         return nullptr;
     }
-    uprv_memset(startDates.getAlias(), 0 , numEras * sizeof(int32_t));
 
     while (ures_hasNext(rb.getAlias())) {
         LocalUResourceBundlePointer eraRuleRes(ures_getNextResource(rb.getAlias(), nullptr, &status));
@@ -141,16 +140,27 @@ EraRules* EraRules::createInstance(const char *calType, UBool includeTentativeEr
         }
         const char *eraIdxStr = ures_getKey(eraRuleRes.getAlias());
         char *endp;
-        int32_t eraIdx = static_cast<int32_t>(strtol(eraIdxStr, &endp, 10));
+        int32_t eraIdx = static_cast<int32_t>(uprv_strtol(eraIdxStr, &endp, 10));
         if (static_cast<size_t>(endp - eraIdxStr) != uprv_strlen(eraIdxStr)) {
             status = U_INVALID_FORMAT_ERROR;
             return nullptr;
         }
-        if (eraIdx < 0 || eraIdx >= numEras) {
+        if (eraIdx < 0) {
             status = U_INVALID_FORMAT_ERROR;
             return nullptr;
         }
-        if (isSet(startDates[eraIdx])) {
+        if (eraIdx + 1 > eraStartDates.size()) {
+            eraStartDates.ensureCapacity(eraIdx + 1, status); // needed only to minimize expansions
+            if (U_FAILURE(status)) {
+                return nullptr;
+            }
+            // Fill in 0 for all added slots (else they are undefined)
+            while (eraStartDates.size() < eraIdx + 1) {
+                eraStartDates.addElement(0, status);
+            }
+        }
+        // Now set the startDate that we just read
+        if (isSet(eraStartDates.elementAti(eraIdx))) {
             // start date of the index was already set
             status = U_INVALID_FORMAT_ERROR;
             return nullptr;
@@ -174,7 +184,7 @@ EraRules* EraRules::createInstance(const char *calType, UBool includeTentativeEr
                     status = U_INVALID_FORMAT_ERROR;
                     return nullptr;
                 }
-                startDates[eraIdx] = encodeDate(fields[0], fields[1], fields[2]);
+                eraStartDates.setElementAt(encodeDate(fields[0], fields[1], fields[2]), eraIdx);
             } else if (uprv_strcmp(key, "named") == 0) {
                 const char16_t *val = ures_getString(res.getAlias(), &len, &status);
                 if (u_strncmp(val, VAL_FALSE, VAL_FALSE_LEN) == 0) {
@@ -185,7 +195,7 @@ EraRules* EraRules::createInstance(const char *calType, UBool includeTentativeEr
             }
         }
 
-        if (isSet(startDates[eraIdx])) {
+        if (isSet(eraStartDates.elementAti(eraIdx))) {
             if (hasEnd) {
                 // This implementation assumes either start or end is available, not both.
                 // For now, just ignore the end rule.
@@ -194,7 +204,7 @@ EraRules* EraRules::createInstance(const char *calType, UBool includeTentativeEr
             if (hasEnd) {
                 // The islamic calendars now have an end-only rule for the
                 // second (and final) entry; basically they are in reverse order.
-                startDates[eraIdx] = MIN_ENCODED_START;
+                eraStartDates.setElementAt(MIN_ENCODED_START, eraIdx);
             } else {
                 status = U_INVALID_FORMAT_ERROR;
                 return nullptr;
@@ -213,11 +223,34 @@ EraRules* EraRules::createInstance(const char *calType, UBool includeTentativeEr
         }
     }
 
+    // Now make array of just the eras we have rules for, with startDate and eraCode for each
+    LocalMemory<StartDateAndEra> startDateAndEras(static_cast<StartDateAndEra *>(uprv_malloc(numEras * sizeof(StartDateAndEra))));
+    if (startDateAndEras.isNull()) {
+        status = U_MEMORY_ALLOCATION_ERROR;
+        return nullptr;
+    }
+    int32_t startDateIdx = 0;
+    for (int32_t eraIdx = 0; eraIdx < eraStartDates.size(); eraIdx++) {
+        if (isSet(eraStartDates.elementAti(eraIdx))) {
+            if (startDateIdx >= numEras) {
+                status = U_INVALID_FORMAT_ERROR;
+                return nullptr;
+            }
+            startDateAndEras[startDateIdx].startDate = eraStartDates.elementAti(eraIdx);
+            startDateAndEras[startDateIdx].eraCode = eraIdx;
+            startDateIdx++;
+        }
+    }
+    if (startDateIdx != numEras) {
+        status = U_INVALID_FORMAT_ERROR;
+        return nullptr;
+    }
+
     EraRules *result;
     if (firstTentativeIdx < MAX_INT32 && !includeTentativeEra) {
-        result = new EraRules(startDates, firstTentativeIdx);
+        result = new EraRules(startDateAndEras, firstTentativeIdx);
     } else {
-        result = new EraRules(startDates, numEras);
+        result = new EraRules(startDateAndEras, numEras);
     }
 
     if (result == nullptr) {
@@ -226,34 +259,42 @@ EraRules* EraRules::createInstance(const char *calType, UBool includeTentativeEr
     return result;
 }
 
-void EraRules::getStartDate(int32_t eraIdx, int32_t (&fields)[3], UErrorCode& status) const {
+void EraRules::getStartDate(int32_t eraCode, int32_t (&fields)[3], UErrorCode& status) const {
     if(U_FAILURE(status)) {
         return;
     }
-    if (eraIdx < 0 || eraIdx >= numEras) {
-        status = U_ILLEGAL_ARGUMENT_ERROR;
-        return;
+    // interate backwards, most likely eras at the end of the array
+    for (int32_t startIndex = numEras; startIndex > 0;) {
+        if (startDateAndEras[--startIndex].eraCode == eraCode) {
+            decodeDate(startDateAndEras[startIndex].startDate, fields);
+            return;
+        }
     }
-    decodeDate(startDates[eraIdx], fields);
+    // We did not find the requested eraCode in our data
+    status = U_ILLEGAL_ARGUMENT_ERROR;
+    return;
 }
 
-int32_t EraRules::getStartYear(int32_t eraIdx, UErrorCode& status) const {
+int32_t EraRules::getStartYear(int32_t eraCode, UErrorCode& status) const {
     int year = MAX_INT32;   // bogus value
     if(U_FAILURE(status)) {
         return year;
     }
-    if (eraIdx < 0 || eraIdx >= numEras) {
-        status = U_ILLEGAL_ARGUMENT_ERROR;
-        return year;
+    // interate backwards, most likely eras at the end of the array
+    for (int32_t startIndex = numEras; startIndex > 0;) {
+        if (startDateAndEras[--startIndex].eraCode == eraCode) {
+            int fields[3];
+            decodeDate(startDateAndEras[startIndex].startDate, fields);
+            year = fields[0];
+            return year;
+        }
     }
-    int fields[3];
-    decodeDate(startDates[eraIdx], fields);
-    year = fields[0];
-
+    // We did not find the requested eraCode in our data
+    status = U_ILLEGAL_ARGUMENT_ERROR;
     return year;
 }
 
-int32_t EraRules::getEraIndex(int32_t year, int32_t month, int32_t day, UErrorCode& status) const {
+int32_t EraRules::getEraCode(int32_t year, int32_t month, int32_t day, UErrorCode& status) const {
     if(U_FAILURE(status)) {
         return -1;
     }
@@ -262,12 +303,12 @@ int32_t EraRules::getEraIndex(int32_t year, int32_t month, int32_t day, UErrorCo
         status = U_ILLEGAL_ARGUMENT_ERROR;
         return -1;
     }
-    if (numEras > 1 && startDates[numEras-1] == MIN_ENCODED_START) {
+    if (numEras > 1 && startDateAndEras[numEras-1].startDate == MIN_ENCODED_START) {
         // Multiple eras in reverse order, linear search from beginning.
         // Currently only for islamic.
-        for (int eraIdx = 0; eraIdx < numEras; eraIdx++) {
-            if (compareEncodedDateWithYMD(startDates[eraIdx], year, month, day) <= 0) {
-                return eraIdx;
+        for (int startIdx = 0; startIdx < numEras; startIdx++) {
+            if (compareEncodedDateWithYMD(startDateAndEras[startIdx].startDate, year, month, day) <= 0) {
+                return startDateAndEras[startIdx].eraCode;
             }
         }
     }
@@ -276,8 +317,8 @@ int32_t EraRules::getEraIndex(int32_t year, int32_t month, int32_t day, UErrorCo
 
     // Short circuit for recent years.  Most modern computations will
     // occur in the last few eras.
-    if (compareEncodedDateWithYMD(startDates[getCurrentEraIndex()], year, month, day) <= 0) {
-        low = getCurrentEraIndex();
+    if (compareEncodedDateWithYMD(startDateAndEras[currentEraStartIndex].startDate, year, month, day) <= 0) {
+        low = currentEraStartIndex;
     } else {
         low = 0;
     }
@@ -285,13 +326,13 @@ int32_t EraRules::getEraIndex(int32_t year, int32_t month, int32_t day, UErrorCo
     // Do binary search
     while (low < high - 1) {
         int i = (low + high) / 2;
-        if (compareEncodedDateWithYMD(startDates[i], year, month, day) <= 0) {
+        if (compareEncodedDateWithYMD(startDateAndEras[i].startDate, year, month, day) <= 0) {
             low = i;
         } else {
             high = i;
         }
     }
-    return low;
+    return startDateAndEras[low].eraCode;
 }
 
 void EraRules::initCurrentEra() {
@@ -314,28 +355,28 @@ void EraRules::initCurrentEra() {
     Grego::timeToFields(localMillis, year, month0, dom, mid, ec);
     if (U_FAILURE(ec)) return;
     int currentEncodedDate = encodeDate(year, month0 + 1 /* changes to 1-base */, dom);
-    int eraIdx = numEras - 1;
-    if (eraIdx > 0 && startDates[eraIdx] == MIN_ENCODED_START) {
+    int startIndex = numEras - 1;
+    if (startIndex > 0 && startDateAndEras[startIndex].startDate == MIN_ENCODED_START) {
         // Multiple eras in reverse order, search from beginning.
         // Currently only for islamic. Here current era must be
         // in the array.
-        for (eraIdx = 0; eraIdx < numEras; eraIdx++) {
-            if (currentEncodedDate >= startDates[eraIdx]) {
+        for (startIndex = 0; startIndex < numEras; startIndex++) {
+            if (currentEncodedDate >= startDateAndEras[startIndex].startDate) {
                 break;
             }
         }
     } else {
         // The usual behavior, search from end
-        while (eraIdx > 0) {
-            if (currentEncodedDate >= startDates[eraIdx]) {
+        while (startIndex > 0) {
+            if (currentEncodedDate >= startDateAndEras[startIndex].startDate) {
                 break;
             }
-            eraIdx--;
+            startIndex--;
         }
         // Note: current era could be before the first era.
-        // In this case, this implementation returns the first era index (0).
+        // In this case, this implementation returns the earliest era code.
     }
-    currentEra = eraIdx;
+    currentEraStartIndex = startIndex;
 }
 
 U_NAMESPACE_END
