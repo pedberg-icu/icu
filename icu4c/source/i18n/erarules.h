@@ -35,7 +35,7 @@ public:
      * @return  maximum defined era code
      */
     inline int32_t getMaxEraCode() const {
-        return startDateAndEras[numEras - 1].eraCode;
+        return eraCodes[numEras - 1];
     }
 
     /**
@@ -75,20 +75,16 @@ public:
      * @return era code of current era (or era code of earliest era when current date is before any era)
      */
     inline int32_t getCurrentEraCode() const {
-        return startDateAndEras[currentEraStartIndex].eraCode;
+        return eraCodes[currentEraStartIndex];
     }
 
 private:
-    struct StartDateAndEra {
-        int32_t startDate;
-        int32_t eraCode;
-    };
-
-    EraRules(LocalMemory<StartDateAndEra>& startDateAndErasIn, int32_t numErasIn);
+    EraRules(LocalMemory<int32_t>& startDatesIn, LocalMemory<int32_t>& eraCodesIn, int32_t numErasIn);
 
     void initCurrentEra();
 
-    LocalMemory<StartDateAndEra> startDateAndEras;
+    LocalMemory<int32_t> startDates;
+    LocalMemory<int32_t> eraCodes;
     int32_t numEras;
     int32_t currentEraStartIndex;
 };

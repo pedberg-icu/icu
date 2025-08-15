@@ -27,12 +27,14 @@ public class EraRules {
     private static final int MONTH_MASK = 0x0000FF00;
     private static final int DAY_MASK = 0x000000FF;
 
-    private int[][] startDateAndEras; // startDate in [n][0], eraCode in [n][1]
+    private int[] startDates;
+    private int[] eraCodes;
     private int numEras;
     private int currentEraStartIndex;
 
-    private EraRules(int[][] startDateAndEras, int numEras) {
-        this.startDateAndEras = startDateAndEras;
+    private EraRules(int[] startDates, int[] eraCodes, int numEras) {
+        this.startDates = startDates;
+        this.eraCodes = eraCodes;
         this.numEras = numEras;
         initCurrentEra();
     }
@@ -64,7 +66,7 @@ public class EraRules {
             }
             if (eraIdx + 1 > eraStartDates.size()) {
                 eraStartDates.ensureCapacity(eraIdx + 1); // needed only to minimize expansions
-                // Fill in empty strings for all added slots
+                // Fill in zeros for all added slots
                 while (eraStartDates.size() < eraIdx + 1) {
                     eraStartDates.add(Integer.valueOf(0));
                 }
@@ -126,30 +128,27 @@ public class EraRules {
             }
         }
 
-        // Now make array of just the eras we have rules for, with startDate and eraCode for each
-        int[][] startDateAndEras = new int[numEras][2];
+        // Now for just the eras we have rules for, make parallel arrays of startDates and eraCodes
+        int[] startDates = new int[numEras];
+        int[] eraCodes = new int[numEras];
         int startDateIdx = 0;
+        int numErasNonTentative = numEras;
         for (int eraIdx = 0; eraIdx < eraStartDates.size(); eraIdx++) {
             if (isSet(eraStartDates.get(eraIdx).intValue())) {
-                if (startDateIdx >= numEras) {
-                    throw new ICUException(
-                            "With start date for era code " + eraIdx + ", found more start dates than era rule bundles (" + numEras + ")");
+                if (eraIdx >= firstTentativeIdx) {
+                    numErasNonTentative = startDateIdx;
                 }
-                startDateAndEras[startDateIdx][0] = eraStartDates.get(eraIdx).intValue();
-                startDateAndEras[startDateIdx][1] = eraIdx;
+                startDates[startDateIdx] = eraStartDates.get(eraIdx).intValue();
+                eraCodes[startDateIdx] = eraIdx;
                 startDateIdx++;
             }
         }
-        if (startDateIdx != numEras) {
-            throw new ICUException(
-                     "number of start dates " + startDateIdx + "did not equal number of era rule bundles (" + numEras + ")");
-        }
 
         if (firstTentativeIdx < Integer.MAX_VALUE && !includeTentativeEra) {
-            return new EraRules(startDateAndEras, firstTentativeIdx);
+            return new EraRules(startDates, eraCodes, numErasNonTentative);
         }
 
-        return new EraRules(startDateAndEras, numEras);
+        return new EraRules(startDates, eraCodes, numEras);
     }
 
     /**
@@ -165,7 +164,7 @@ public class EraRules {
      * @return  maximum defined era code
      */
     public int getMaxEraCode() {
-        return startDateAndEras[numEras - 1][1];
+        return eraCodes[numEras - 1];
     }
 
     /**
@@ -180,8 +179,8 @@ public class EraRules {
     public int[] getStartDate(int eraCode, int[] fillIn) {
         // interate backwards, most likely eras at the end of the array
         for (int startIndex = numEras; startIndex > 0;) {
-            if (startDateAndEras[--startIndex][1] == eraCode) {
-                return decodeDate(startDateAndEras[startIndex][0], fillIn);
+            if (eraCodes[--startIndex] == eraCode) {
+                return decodeDate(startDates[startIndex], fillIn);
             }
         }
         // We did not find the requested eraCode in our data
@@ -197,8 +196,8 @@ public class EraRules {
     public int getStartYear(int eraCode) {
         // interate backwards, most likely eras at the end of the array
         for (int startIndex = numEras; startIndex > 0;) {
-            if (startDateAndEras[--startIndex][1] == eraCode) {
-                int[] fields = decodeDate(startDateAndEras[startIndex][0], null);
+            if (eraCodes[--startIndex] == eraCode) {
+                int[] fields = decodeDate(startDates[startIndex], null);
                 return fields[0];
             }
         }
@@ -217,12 +216,12 @@ public class EraRules {
         if (month < 1 || month > 12 || day < 1 || day > 31) {
             throw new IllegalArgumentException("Illegal date - year:" + year + "month:" + month + "day:" + day);
         }
-        if (numEras > 1 && startDateAndEras[numEras-1][0] == MIN_ENCODED_START) {
+        if (numEras > 1 && startDates[numEras-1] == MIN_ENCODED_START) {
             // Multiple eras in reverse order, linear search from beginning.
             // Currently only for islamic.
             for (int startIdx = 0; startIdx < numEras; startIdx++) {
-                if (compareEncodedDateWithYMD(startDateAndEras[startIdx][0], year, month, day) <= 0) {
-                    return startDateAndEras[startIdx][1];
+                if (compareEncodedDateWithYMD(startDates[startIdx], year, month, day) <= 0) {
+                    return eraCodes[startIdx];
                 }
             }
         }
@@ -231,7 +230,7 @@ public class EraRules {
 
         // Short circuit for recent years.  Most modern computations will
         // occur in the last few eras.
-        if (compareEncodedDateWithYMD(startDateAndEras[currentEraStartIndex][0], year, month, day) <= 0) {
+        if (compareEncodedDateWithYMD(startDates[currentEraStartIndex], year, month, day) <= 0) {
             low = currentEraStartIndex;
         } else {
             low = 0;
@@ -240,13 +239,13 @@ public class EraRules {
         // Do binary search
         while (low < high - 1) {
             int i = (low + high) / 2;
-            if (compareEncodedDateWithYMD(startDateAndEras[i][0], year, month, day) <= 0) {
+            if (compareEncodedDateWithYMD(startDates[i], year, month, day) <= 0) {
                 low = i;
             } else {
                 high = i;
             }
         }
-        return startDateAndEras[low][1];
+        return eraCodes[low];
     }
 
     /**
@@ -257,7 +256,7 @@ public class EraRules {
      * @return era index of current era (or era code of earliest era when current date is before any era)
      */
     public int getCurrentEraCode() {
-        return startDateAndEras[currentEraStartIndex][1];
+        return eraCodes[currentEraStartIndex];
     }
 
     private void initCurrentEra() {
@@ -268,19 +267,19 @@ public class EraRules {
         int[] fields = Grego.timeToFields(localMillis, null);
         int currentEncodedDate = encodeDate(fields[0], fields[1] + 1 /* changes to 1-base */, fields[2]);
         int startIndex = numEras - 1;
-        if (startIndex > 0 && startDateAndEras[startIndex][0] == MIN_ENCODED_START) {
+        if (startIndex > 0 && startDates[startIndex] == MIN_ENCODED_START) {
             // Multiple eras in reverse order, search from beginning.
             // Currently only for islamic. Here current era must be
             // in the array.
             for (startIndex = 0; startIndex < numEras; startIndex++) {
-                if (currentEncodedDate >= startDateAndEras[startIndex][0]) {
+                if (currentEncodedDate >= startDates[startIndex]) {
                     break;
                 }
             }
         } else {
             // The usual behavior, search from end
             while (startIndex > 0) {
-               if (currentEncodedDate >= startDateAndEras[startIndex][0]) {
+               if (currentEncodedDate >= startDates[startIndex]) {
                     break;
                 }
                 startIndex--;

@@ -103,9 +103,10 @@ static int32_t compareEncodedDateWithYMD(int encoded, int year, int month, int d
     }
 }
 
-EraRules::EraRules(LocalMemory<StartDateAndEra>&  startDateAndErasIn, int32_t numErasIn)
+EraRules::EraRules(LocalMemory<int32_t>& startDatesIn, LocalMemory<int32_t>& eraCodesIn, int32_t numErasIn)
     : numEras(numErasIn) {
-    startDateAndEras = std::move(startDateAndErasIn);
+    startDates = std::move(startDatesIn);
+    eraCodes = std::move(eraCodesIn);
     initCurrentEra();
 }
 
@@ -223,34 +224,31 @@ EraRules* EraRules::createInstance(const char *calType, UBool includeTentativeEr
         }
     }
 
-    // Now make array of just the eras we have rules for, with startDate and eraCode for each
-    LocalMemory<StartDateAndEra> startDateAndEras(static_cast<StartDateAndEra *>(uprv_malloc(numEras * sizeof(StartDateAndEra))));
-    if (startDateAndEras.isNull()) {
+    // Now for just the eras we have rules for, make parallel arrays of startDates and eraCodes
+    LocalMemory<int32_t> startDates(static_cast<int32_t *>(uprv_malloc(numEras * sizeof(int32_t))));
+    LocalMemory<int32_t> eraCodes(static_cast<int32_t *>(uprv_malloc(numEras * sizeof(int32_t))));
+    if (startDates.isNull() || eraCodes.isNull()) {
         status = U_MEMORY_ALLOCATION_ERROR;
         return nullptr;
     }
     int32_t startDateIdx = 0;
+    int32_t numErasNonTentative = numEras;
     for (int32_t eraIdx = 0; eraIdx < eraStartDates.size(); eraIdx++) {
         if (isSet(eraStartDates.elementAti(eraIdx))) {
-            if (startDateIdx >= numEras) {
-                status = U_INVALID_FORMAT_ERROR;
-                return nullptr;
+            if (eraIdx >= firstTentativeIdx) {
+                numErasNonTentative = startDateIdx;
             }
-            startDateAndEras[startDateIdx].startDate = eraStartDates.elementAti(eraIdx);
-            startDateAndEras[startDateIdx].eraCode = eraIdx;
+            startDates[startDateIdx] = eraStartDates.elementAti(eraIdx);
+            eraCodes[startDateIdx] = eraIdx;
             startDateIdx++;
         }
-    }
-    if (startDateIdx != numEras) {
-        status = U_INVALID_FORMAT_ERROR;
-        return nullptr;
     }
 
     EraRules *result;
     if (firstTentativeIdx < MAX_INT32 && !includeTentativeEra) {
-        result = new EraRules(startDateAndEras, firstTentativeIdx);
+        result = new EraRules(startDates, eraCodes, numErasNonTentative);
     } else {
-        result = new EraRules(startDateAndEras, numEras);
+        result = new EraRules(startDates, eraCodes, numEras);
     }
 
     if (result == nullptr) {
@@ -265,8 +263,8 @@ void EraRules::getStartDate(int32_t eraCode, int32_t (&fields)[3], UErrorCode& s
     }
     // interate backwards, most likely eras at the end of the array
     for (int32_t startIndex = numEras; startIndex > 0;) {
-        if (startDateAndEras[--startIndex].eraCode == eraCode) {
-            decodeDate(startDateAndEras[startIndex].startDate, fields);
+        if (eraCodes[--startIndex] == eraCode) {
+            decodeDate(startDates[startIndex], fields);
             return;
         }
     }
@@ -282,9 +280,9 @@ int32_t EraRules::getStartYear(int32_t eraCode, UErrorCode& status) const {
     }
     // interate backwards, most likely eras at the end of the array
     for (int32_t startIndex = numEras; startIndex > 0;) {
-        if (startDateAndEras[--startIndex].eraCode == eraCode) {
+        if (eraCodes[--startIndex] == eraCode) {
             int fields[3];
-            decodeDate(startDateAndEras[startIndex].startDate, fields);
+            decodeDate(startDates[startIndex], fields);
             year = fields[0];
             return year;
         }
@@ -303,12 +301,12 @@ int32_t EraRules::getEraCode(int32_t year, int32_t month, int32_t day, UErrorCod
         status = U_ILLEGAL_ARGUMENT_ERROR;
         return -1;
     }
-    if (numEras > 1 && startDateAndEras[numEras-1].startDate == MIN_ENCODED_START) {
+    if (numEras > 1 && startDates[numEras-1] == MIN_ENCODED_START) {
         // Multiple eras in reverse order, linear search from beginning.
         // Currently only for islamic.
         for (int startIdx = 0; startIdx < numEras; startIdx++) {
-            if (compareEncodedDateWithYMD(startDateAndEras[startIdx].startDate, year, month, day) <= 0) {
-                return startDateAndEras[startIdx].eraCode;
+            if (compareEncodedDateWithYMD(startDates[startIdx], year, month, day) <= 0) {
+                return eraCodes[startIdx];
             }
         }
     }
@@ -317,7 +315,7 @@ int32_t EraRules::getEraCode(int32_t year, int32_t month, int32_t day, UErrorCod
 
     // Short circuit for recent years.  Most modern computations will
     // occur in the last few eras.
-    if (compareEncodedDateWithYMD(startDateAndEras[currentEraStartIndex].startDate, year, month, day) <= 0) {
+    if (compareEncodedDateWithYMD(startDates[currentEraStartIndex], year, month, day) <= 0) {
         low = currentEraStartIndex;
     } else {
         low = 0;
@@ -326,13 +324,13 @@ int32_t EraRules::getEraCode(int32_t year, int32_t month, int32_t day, UErrorCod
     // Do binary search
     while (low < high - 1) {
         int i = (low + high) / 2;
-        if (compareEncodedDateWithYMD(startDateAndEras[i].startDate, year, month, day) <= 0) {
+        if (compareEncodedDateWithYMD(startDates[i], year, month, day) <= 0) {
             low = i;
         } else {
             high = i;
         }
     }
-    return startDateAndEras[low].eraCode;
+    return eraCodes[low];
 }
 
 void EraRules::initCurrentEra() {
@@ -356,19 +354,19 @@ void EraRules::initCurrentEra() {
     if (U_FAILURE(ec)) return;
     int currentEncodedDate = encodeDate(year, month0 + 1 /* changes to 1-base */, dom);
     int startIndex = numEras - 1;
-    if (startIndex > 0 && startDateAndEras[startIndex].startDate == MIN_ENCODED_START) {
+    if (startIndex > 0 && startDates[startIndex] == MIN_ENCODED_START) {
         // Multiple eras in reverse order, search from beginning.
         // Currently only for islamic. Here current era must be
         // in the array.
         for (startIndex = 0; startIndex < numEras; startIndex++) {
-            if (currentEncodedDate >= startDateAndEras[startIndex].startDate) {
+            if (currentEncodedDate >= startDates[startIndex]) {
                 break;
             }
         }
     } else {
         // The usual behavior, search from end
         while (startIndex > 0) {
-            if (currentEncodedDate >= startDateAndEras[startIndex].startDate) {
+            if (currentEncodedDate >= startDates[startIndex]) {
                 break;
             }
             startIndex--;
