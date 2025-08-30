@@ -884,7 +884,7 @@ ca{
             ls{"Hora de Chuuk"}
         }
         "meta:Turkey"{
-            ld{"Hora d'estiu de Turquia"}
+            ld{"Hora d’estiu de Turquia"}
             lg{"Hora de Turquia"}
             ls{"Hora estàndard de Turquia"}
         }

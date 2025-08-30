@@ -11,7 +11,7 @@ nl{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         arab{
@@ -23,140 +23,140 @@ nl{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         bali{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         beng{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         brah{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         cakm{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         cham{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         deva{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         fullwide{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         gong{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         gonm{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         gujr{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         guru{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         hanidec{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         java{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         kali{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         khmr{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         knda{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         lana{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         lanatham{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         laoo{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         latn{
@@ -170,7 +170,7 @@ nl{
                 accountingFormat%noCurrency{"#,##0.00;(#,##0.00)"}
                 currencyFormat{"¤ #,##0.00;¤ -#,##0.00"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
             patternsLong{
                 decimalFormat{
@@ -311,14 +311,14 @@ nl{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         limb{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         minimalPairs{
@@ -338,147 +338,147 @@ nl{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         mong{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         mtei{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         mymr{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         mymrshan{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         nkoo{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         olck{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         orya{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         osma{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         rohg{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         saur{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         shrd{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         sora{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         sund{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         takr{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         talu{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         tamldec{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         telu{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         thai{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         tibt{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
         vaii{
             patterns{
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;(¤ #,##0.00)"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤ -#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
+                currencyFormat%noCurrency{"#,##0.00"}
             }
         }
     }

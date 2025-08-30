@@ -8,10 +8,8 @@ en_CH{
             patterns{
                 accountingFormat{"¤ #,##0.00;¤-#,##0.00"}
                 accountingFormat%alphaNextToNumber{"¤ #,##0.00;¤-#,##0.00"}
-                accountingFormat%noCurrency{"#,##0.00;-#,##0.00"}
                 currencyFormat{"¤ #,##0.00;¤-#,##0.00"}
                 currencyFormat%alphaNextToNumber{"¤ #,##0.00;¤-#,##0.00"}
-                currencyFormat%noCurrency{"#,##0.00;-#,##0.00"}
             }
             symbols{
                 group{"’"}

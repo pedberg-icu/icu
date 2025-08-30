@@ -33,6 +33,7 @@
     },
     "parents": {
         "ff_Adlm": "root",
+        "kk_Arab": "root",
         "nb": "no",
         "nn": "no"
     }
