@@ -971,8 +971,9 @@ static void VerifyTranslation(void) {
             langSize = uloc_getDisplayLanguage(currLoc, currLoc, langBuffer, UPRV_LENGTHOF(langBuffer), &errorCode);
             if (U_FAILURE(errorCode)) {
                 log_err("error uloc_getDisplayLanguage returned %s\n", u_errorName(errorCode));
-            }
-            else {
+            } else if (uprv_strncmp(currLoc,"shn",3) == 0) {
+                log_knownIssue("CLDR-18922", "shn: Language autonym, month/day names use chars not in exemplars");
+            } else {
                 strIdx = findStringSetMismatch(currLoc, langBuffer, langSize, mergedExemplarSet, false, &badChar);
                 if (strIdx >= 0) {
                     log_err("getDisplayLanguage(%s) at index %d returned characters not in the exemplar characters: %04X.\n",
@@ -1019,7 +1020,11 @@ static void VerifyTranslation(void) {
                 if (uprv_strncmp(currLoc,"ak",2) == 0 &&  
                         log_knownIssue("CLDR-17852", "Some month names in ax(_GH) use chars not in exemplars")) {
                     end = 0;
-                }                
+                }
+                if (uprv_strncmp(currLoc,"shn",3) == 0) {
+                    log_knownIssue("CLDR-18922", "shn: Language autonym, month/day names use chars not in exemplars");
+                    end = 0;
+                }              
 
                 for (idx = 0; idx < end; idx++) {
                     const UChar *fromBundleStr = ures_getStringByIndex(resArray, idx, &langSize, &errorCode);
@@ -1065,6 +1070,10 @@ static void VerifyTranslation(void) {
                         log_knownIssue("CLDR-17852", "Some month names in ax(_GH) use chars not in exemplars")) {
                     end = 0;
                 }  
+                if (uprv_strncmp(currLoc,"shn",3) == 0) {
+                    log_knownIssue("CLDR-18922", "shn: Language autonym, month/day names use chars not in exemplars");
+                    end = 0;
+                }              
 
                 for (idx = 0; idx < end; idx++) {
                     const UChar *fromBundleStr = ures_getStringByIndex(resArray, idx, &langSize, &errorCode);

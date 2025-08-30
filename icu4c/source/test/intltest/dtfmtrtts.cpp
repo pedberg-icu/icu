@@ -296,6 +296,10 @@ void DateFormatRoundTripTest::test(DateFormat *fmt, const Locale &origLocale, UB
       return;
     } 
     //logln(UnicodeString("Min date is ") + fullFormat(minDate)  + " for " + origLocale.getName());
+    if (uprv_strncmp(origLocale.getBaseName(),"scn",3) == 0) {
+        logKnownIssue("CLDR-18923", "Quoting in scn atTime/relative dateTimeFormats causes parse issues");
+        return;
+    }   
 
     pat = dynamic_cast<SimpleDateFormat*>(fmt)->toPattern(pat);
 
