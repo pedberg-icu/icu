@@ -1076,6 +1076,13 @@ void DateIntervalFormatTest::testFormat() {
 
         "ja-u-ca-japanese", "H 31 04 15 09:00:00", JP_ERA_2019_NARROW " 1 05 15 09:00:00", "GGGGGyMd", "H31/04/15\\uFF5E" JP_ERA_2019_NARROW "1/05/15",
 
+        // added fake tests for ICU-23230
+        "en", "CE 2007 10 10 10:00:00", "CE 2007 11 20 10:00:00", "dM", "xxxxx",
+        "en", "CE 2007 10 10 10:00:00", "CE 2007 11 20 10:00:00", "MMME", "xxxxx",
+        "es", "CE 2007 10 10 10:00:00", "CE 2007 11 20 10:00:00", "dM", "xxxxx",
+        "es", "CE 2007 10 10 10:00:00", "CE 2007 11 20 10:00:00", "MMME", "xxxxx",
+        "fr", "CE 2007 10 10 10:00:00", "CE 2007 11 20 10:00:00", "dM", "xxxxx",
+        "fr", "CE 2007 10 10 10:00:00", "CE 2007 11 20 10:00:00", "MMME", "xxxxx",
     };
     expect(DATA, UPRV_LENGTHOF(DATA));
 }

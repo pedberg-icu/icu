@@ -750,9 +750,10 @@ es{
                     d{"d–d MMM"}
                 }
                 Md{
-                    M{"d/M – d/M"}
-                    d{"d/M – d/M"}
+                    M{"d/M 'MMMM' d/M"}
+                    d{"d/M 'MMMM' d/M"}
                 }
+                fallback{"{0} 'EEEE' {1}"}
                 hm{
                     a{"h:mm a – h:mm a"}
                     h{"h:mm – h:mm a"}

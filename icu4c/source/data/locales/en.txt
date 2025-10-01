@@ -1189,13 +1189,13 @@ en{
                     d{"MMM d – d"}
                 }
                 Md{
-                    M{"M/d – M/d"}
-                    d{"M/d – M/d"}
+                    M{"M/d MMMM M/d"}
+                    d{"M/d MMMM M/d"}
                 }
                 d{
                     d{"d – d"}
                 }
-                fallback{"{0} – {1}"}
+                fallback{"{0} EEEE {1}"}
                 h{
                     a{"h a – h a"}
                     h{"h – h a"}
